@@ -34,3 +34,26 @@ The client program communicates with a server using shared memory and semaphores
 
 3. Detach the Segment:
   * After completing all the requests, the shared memory segment is detached from the client process using shmdt(). This frees the resources associated with accessing the shared memory.
+
+
+## Client.c "multiple client"
+This program was modified to enable the simultaneous execution of multiple clients, with each client making requests and sharing a memory segment with the server through semaphores. The key changes and adjustments made to achieve this functionality are as follows:
+
+### Function client_function(int client_id)
+   * The client_function was introduced to manage each client's requests within separate processes.
+   * The function receives a client_id argument, which helps in tracking individual clients and allows for more efficient management when displaying debugging messages.
+
+### Creating Client Processes in main
+   * In main, a loop is set up to create multiple client processes. The number of clients is defined by the num_clients variable, set here to 100.
+   * Each call to fork() creates a separate client process. If the process is a child (pid == 0), it executes client_function and then exits with exit(0).
+   * The parent process waits for each client to finish using wait(NULL), preventing any zombie processes.
+
+### Synchronization Control with Semaphores
+   * Semaphores are used to ensure coordinated access to the shared memory.
+   * Each client uses acq_sem and lib_sem calls to acquire and release semaphores, thus protecting the critical section where each client reads and writes to the shared memory.
+   * The server responds with res_ok to signal that a request has been processed, allowing the client to validate the result and release the resources.
+
+
+
+
+
